@@ -1,0 +1,29 @@
+---
+- name: Linux server health check
+  hosts: all
+  gather_facts: true
+
+  tasks:
+    - name: Collect uptime and load
+      ansible.builtin.command: uptime
+      register: uptime_result
+      changed_when: false
+
+    - name: Collect memory usage
+      ansible.builtin.command: free -h
+      register: memory_result
+      changed_when: false
+
+    - name: Collect root disk usage
+      ansible.builtin.command: df -h /
+      register: disk_result
+      changed_when: false
+
+    - name: Display health report
+      ansible.builtin.debug:
+        msg:
+          - "Hostname: {{ ansible_hostname }}"
+          - "Operating system: {{ ansible_distribution }} {{ ansible_distribution_version }}"
+          - "Uptime and load: {{ uptime_result.stdout }}"
+          - "Memory usage: {{ memory_result.stdout }}"
+          - "Root disk usage: {{ disk_result.stdout }}"
